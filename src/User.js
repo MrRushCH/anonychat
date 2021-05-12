@@ -1,13 +1,9 @@
-import config from "./firebase/firebaseConfig";
-import firebase from "firebase";
-
+import database from "./firebase/firebaseConfig";
 import Room from "./Room";
-
-firebase.initializeApp(config);
-const database = firebase.database();
 
 class Client {
     constructor() {
+        this.room = new Room();
         this.uid = this.createNewUser();
 
         window.onbeforeunload = () => {
@@ -15,21 +11,13 @@ class Client {
         }
     }
     createNewUser() {
-        database.ref("users/").limitToLast(1).once("value").then((val) => {
-            this.uid = val.val()[0]["uid"]+1;
-            database.ref(`users/${this.uid}`).set({
-                uid: this.uid,
-                rid: this.rid
+        database.ref("users/").get().then((res) => {
+            const uid = res.val()[res.val().length-1]["uid"]+1;
+            database.ref(`users/${uid}`).set({
+                uid: uid,
+                rid: this.room.rid
             })
-        })
-    }
-    createNewRoom() {
-        database.ref("rooms/").limitToLast(1).once("value").then((val) => {
-            this.rid = val.val()[0]["rid"]+1;
-            database.ref(`users/${this.rid}`).set({
-                rid: this.rid,
-                messages: []
-            })
+            return uid;
         })
     }
 }
