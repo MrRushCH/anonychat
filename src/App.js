@@ -1,15 +1,19 @@
+import { useState } from 'react';
 import './App.css';
-import config from "./firebase/firebaseConfig";
-import firebase from "firebase";
 import User from "./User";
-import database from "./firebase/firebaseConfig";
 
 function App() {
-  const user = new User();
-  
+  const [user, setUser] = useState();
+  if(!user) {
+    User().then((res) => {
+      setUser(res);
+    })
+  }
   return (
     <div className="App">
-      <div></div>
+      <div>
+        {user?user.uid:"creating user..."}
+      </div>
     </div>
   );
 }

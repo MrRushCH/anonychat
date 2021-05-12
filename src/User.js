@@ -1,25 +1,35 @@
 import database from "./firebase/firebaseConfig";
 import Room from "./Room";
 
-class Client {
-    constructor() {
-        this.room = new Room();
-        this.uid = this.createNewUser();
-
-        window.onbeforeunload = () => {
-            database.ref("users/").child(this.uid).remove();
-        }
+async function User() {
+    const createNewUser = async () => {
+        return await new Promise((resolve, reject) => {
+            database.ref("users/").get().then((res) => {
+                const uid = res.val()[res.val().length-1]["uid"]+1;
+                resolve(setUser(uid));
+            }).catch((err) => {
+                reject(err)
+            })
+        })
     }
-    createNewUser() {
-        database.ref("users/").get().then((res) => {
-            const uid = res.val()[res.val().length-1]["uid"]+1;
+    const setUser = async (uid) => {
+        return await new Promise((resolve, reject) => {
             database.ref(`users/${uid}`).set({
                 uid: uid,
-                rid: this.room.rid
+                rid: room.rid
+            }).then(() => {
+                resolve(uid);
+            }).catch((err) => {
+                reject(err)
             })
-            return uid;
         })
+    }
+    const room = await Room();
+    const uid = await createNewUser();
+    return {
+        room: room,
+        uid: uid
     }
 }
 
-export default Client;
+export default User;
