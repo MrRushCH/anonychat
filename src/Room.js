@@ -8,6 +8,7 @@ async function Room() {
                 res.val().forEach((item) => {
                     if(item["memberCount"] < 10) {
                         resolve(item["rid"]);
+                        updateMemberCount(item["rid"])
                     }
                 })
                 resolve(createNewRoom());
@@ -22,6 +23,7 @@ async function Room() {
             request.then((res) => {
                 const rid = res.val()[res.val().length-1]["rid"]+1;
                 resolve(setRoom(rid));
+                updateMemberCount(rid)
             }).catch((err) => {
                 reject(err)
             })
@@ -39,6 +41,13 @@ async function Room() {
             })
         })
     }
+    const updateMemberCount = async (rid) => {
+        const ref = database.ref(`/rooms/${rid}/memberCount`);
+        const val = ref.get();
+        val.then((res) => {
+            ref.set(res.val()+1);
+        })
+    } 
     const rid = await getRoomId();
     return {
         rid: rid
