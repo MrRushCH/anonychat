@@ -5,12 +5,19 @@ async function Room() {
         const request = database.ref("rooms/").get();
         return await new Promise((resolve, reject) => {
             request.then((res) => {
-                res.val().forEach((item) => {
+                if(!res.val()) {
+                    resolve(setRoom(0));
+                    updateMemberCount(0);
+                    return
+                }
+                for(var item of res.val()){
+                    console.log(item["memberCount"])
                     if(item["memberCount"] < 10) {
                         resolve(item["rid"]);
-                        updateMemberCount(item["rid"])
+                        updateMemberCount(item["rid"]);
+                        return;
                     }
-                })
+                }
                 resolve(createNewRoom());
             }).catch((err) => {
                 reject(err)
@@ -45,6 +52,9 @@ async function Room() {
         const ref = database.ref(`/rooms/${rid}/memberCount`);
         const val = ref.get();
         val.then((res) => {
+            if(!val) {
+                ref.set(1);
+            }
             ref.set(res.val()+1);
         })
     } 

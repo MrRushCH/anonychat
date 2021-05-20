@@ -7,15 +7,15 @@ import Dispose from "./Dispose";
 
 function App() {
   const [user, setUser] = useState();
+  const [memberCount, setMemberCount] = useState();
   if(!user) {
     User().then((res) => {
       setUser(res);
-      console.log(res.room)
     })
   }
-  window.onbeforeunload = () => {
+  window.onbeforeunload = function (e) {
     Dispose(user);
-  }
+};
   return (
     <div className="App">
       <div>

@@ -5,6 +5,9 @@ async function User() {
     const createNewUser = async () => {
         return await new Promise((resolve, reject) => {
             database.ref("users/").get().then((res) => {
+                if(!res.val()) {
+                    resolve(setUser(0));
+                }
                 const uid = res.val()[res.val().length-1]["uid"]+1;
                 resolve(setUser(uid));
             }).catch((err) => {
